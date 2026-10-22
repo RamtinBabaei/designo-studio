@@ -1,0 +1,28 @@
+'use client';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { ArrowUpRight, CircleAlert, Check } from 'lucide-react';
+import { validateContact, serviceOptions, type ContactFields, type FieldErrors } from '@/lib/contact/validation';
+const empty:ContactFields={name:'',email:'',phone:'',service:'not-sure',message:'',website:'',requestId:''};
+const labels:Record<string,string>={'web-design':'Web design','app-design':'App design','graphic-design':'Graphic design','not-sure':'Let’s figure it out together'};
+export function ContactForm(){
+ const [fields,setFields]=useState(empty),[errors,setErrors]=useState<FieldErrors>({}),[status,setStatus]=useState<'idle'|'submitting'|'success'|'error'>('idle'),[error,setError]=useState(''),[reference,setReference]=useState('');
+ const form=useRef<HTMLFormElement>(null);const success=useRef<HTMLDivElement>(null);const inFlight=useRef(false);
+ useEffect(()=>{const service=new URLSearchParams(window.location.search).get('service');setFields(f=>({...f,requestId:crypto.randomUUID(),...(service&&serviceOptions.includes(service as typeof serviceOptions[number])?{service}:{})}));},[]);
+ useEffect(()=>{if(status==='success')success.current?.focus();},[status]);
+ const update=(key:keyof ContactFields,value:string)=>{setFields(f=>({...f,[key]:value}));setErrors(e=>({...e,[key]:undefined}));if(status==='error')setStatus('idle');};
+ function focusFirst(next:FieldErrors){const key=Object.keys(next)[0];if(key)requestAnimationFrame(()=>form.current?.querySelector<HTMLElement>(`[name="${key}"]`)?.focus());}
+ async function submit(event:FormEvent){
+  event.preventDefault();if(inFlight.current)return;
+  const validation=validateContact(fields);if(!validation.ok){setErrors(validation.errors);focusFirst(validation.errors);return;}
+  inFlight.current=true;setStatus('submitting');setError('');setErrors({});
+  try{
+   const response=await fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(validation.data),signal:AbortSignal.timeout(20000)});
+   const data=await response.json() as {ok?:boolean;id?:string;error?:string;errors?:FieldErrors};
+   if(!response.ok||!data.ok||!data.id){setErrors(data.errors||{});setError(data.error||'Your message wasn’t saved. Please try again.');setStatus('error');if(data.errors)focusFirst(data.errors);return;}
+   setReference(data.id);setStatus('success');
+  }catch{setError('We couldn’t confirm your submission. Check your connection and try again. Your draft is still here.');setStatus('error');}finally{inFlight.current=false;}
+ }
+ if(status==='success')return <div className="form-success" ref={success} tabIndex={-1} role="status"><span className="success-icon"><Check size={27}/></span><h2>A great idea<br/>starts right here.</h2><p>Your project brief has been saved successfully. Keep your reference below.</p><p className="reference">Reference: {reference.slice(0,8).toUpperCase()}</p><p className="form-privacy">This is a portfolio demo. Your brief is stored securely; no email notification is sent.</p><button className="button button-white" onClick={()=>{setFields({...empty,requestId:crypto.randomUUID()});setStatus('idle');}}>Send another message <ArrowUpRight size={16}/></button></div>;
+ function field(key:'name'|'email'|'phone'|'message',label:string,placeholder:string,maxLength:number,required=false){return <div className="form-field"><label htmlFor={key}>{label}{!required&&<span> (optional)</span>}</label>{key==='message'?<textarea id={key} name={key} placeholder={placeholder} value={fields[key]} onChange={e=>update(key,e.target.value)} maxLength={maxLength} required={required} aria-invalid={!!errors[key]} aria-describedby={errors[key]?`${key}-error`:undefined}/>:<input id={key} name={key} type={key==='email'?'email':key==='phone'?'tel':'text'} autoComplete={key==='phone'?'tel':key} placeholder={placeholder} value={fields[key]} onChange={e=>update(key,e.target.value)} maxLength={maxLength} required={required} aria-invalid={!!errors[key]} aria-describedby={errors[key]?`${key}-error`:undefined}/>} {errors[key]&&<span className="field-error" id={`${key}-error`}>{errors[key]} <CircleAlert size={14}/></span>}</div>;}
+ return <form className="contact-form" ref={form} onSubmit={submit} noValidate aria-label="Project inquiry form" aria-busy={status==='submitting'}>{status==='error'&&<div className="form-error" role="alert">{error}</div>}{field('name','Your name','Alex Johnson',100,true)}{field('email','Email address','alex@yourcompany.com',254,true)}{field('phone','Phone number','+1 (555) 000-0000',40)}<div className="form-field"><label htmlFor="service">What can we help you with?</label><select id="service" name="service" value={fields.service} onChange={e=>update('service',e.target.value)}>{serviceOptions.map(s=><option value={s} key={s}>{labels[s]}</option>)}</select>{errors.service&&<span id="service-error" className="field-error">{errors.service}</span>}</div>{field('message','Your message','Tell us a little about your idea…',3000,true)}<div className="honeypot" aria-hidden="true"><label htmlFor="website">Website</label><input id="website" name="website" tabIndex={-1} autoComplete="off" value={fields.website} onChange={e=>update('website',e.target.value)}/></div><div className="form-actions"><span>Good things start with a hello.</span><button className="button button-white" type="submit" disabled={status==='submitting'||!fields.requestId}>{status==='submitting'?'Sending…':'Submit'} <ArrowUpRight size={17}/></button></div><p className="form-privacy">Portfolio demo: your details and message are saved to this site’s database. Please use sample details. No email is sent.</p></form>;
+}
