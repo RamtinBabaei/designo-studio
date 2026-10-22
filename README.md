@@ -1,6 +1,6 @@
 # Designo Studio
 
-A polished seven-page creative studio website based on the Frontend Mentor Designo challenge, with a real, validated contact API and persistent database. Built for Ramtin Babaei's software engineering portfolio.
+A seven-page creative studio website with responsive service pages, project dialogs, office information, and a validated contact API backed by a persistent database.
 
 **React 19 · TypeScript · Vite / Vinext · Tailwind CSS 4 · Cloudflare Workers · D1 / SQLite · Drizzle migrations · Node test runner**
 
@@ -85,8 +85,8 @@ This project contains server functionality and **cannot run as a full-stack app 
 
 Read [docs/TEST_REPORT.md](docs/TEST_REPORT.md) for executed checks and outstanding browser verification. The app has not been assigned invented Lighthouse scores. The reference's paid Figma/Sketch files were not supplied; exact pixel comparison has not been verified. Vinext is a beta framework dependency from the supported Sites runtime and should be evaluated before an independently operated production rollout.
 
-## Portfolio summary
+## Implementation summary
 
-Designed and implemented a responsive seven-page creative agency experience with React and TypeScript, backed by a Cloudflare Workers contact API and D1 database. Built reusable page templates, progressive interactions, and a shared validation pipeline. Added atomic idempotency and abuse controls, optimized image delivery, schema migrations, and automated API/database regression tests.
+Implemented a responsive seven-page creative agency experience with React and TypeScript, backed by a Cloudflare Workers contact API and D1 database. Built reusable page templates, progressive interactions, and a shared validation pipeline. Added atomic idempotency and abuse controls, optimized image delivery, schema migrations, and automated API/database regression tests.
 
 Attribution and asset terms: [docs/ASSET-CREDITS.md](docs/ASSET-CREDITS.md). Scope: [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md). Design and artwork: Frontend Mentor; application implementation: Ramtin Babaei portfolio project.
