@@ -6,7 +6,7 @@ A seven-page creative studio website with responsive service pages, project dial
 
 ## Live website
 
-**[Open Designo Studio](https://designo-studio.shaficp.chatgpt.site)**
+**[Open Designo Studio](https://designo-studio.ramtinbabaei-portfolio.workers.dev)**
 
 [Source code](https://github.com/RamtinBabaei/designo-studio) · [Quality checks](https://github.com/RamtinBabaei/designo-studio/actions)
 
