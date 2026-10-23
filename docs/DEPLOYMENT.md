@@ -2,7 +2,7 @@
 
 ## Supported hosted workflow
 
-Sites builds this Vinext application into a Cloudflare Worker and static client assets. `.openai/hosting.json` declares `d1: "DB"`; hosting provisions the actual database and applies the committed Drizzle migrations before publication. The published portfolio demo is publicly accessible at https://designo-studio.shaficp.chatgpt.site. New Sites start private by default. Source control and site publishing are separate from ordinary GitHub pushes.
+Sites builds this Vinext application into a Cloudflare Worker and static client assets. `.openai/hosting.json` declares `d1: "DB"`; hosting provisions the actual database and applies the committed Drizzle migrations before publication. The published portfolio demo is publicly accessible at https://designo-studio.ramtinbabaei-portfolio.workers.dev. New Sites start private by default. Source control and site publishing are separate from ordinary GitHub pushes.
 
 For a new deployment outside this exact Site, create a new Site through Sites and let its workflow set the new identity. Do not reuse another Site's project ID or credentials.
 
@@ -53,3 +53,8 @@ Inspect the generated Worker filename before deploying if you upgrade Vinext or 
 ## Operating the form
 
 Inquiries are durable database records, not emails. Use an authenticated operator tool such as the Cloudflare D1 console to inspect records. Do not add an unauthenticated GET endpoint exposing personal data. To use the site for real business, replace fictional office details, establish data retention/privacy rules, and add a verified notification provider if email is required. Notification delivery needs separate credentials, domain verification, retries, and end-to-end testing.
+
+
+## Public demo address
+
+The public URL above is served by the account’s dedicated Cloudflare Worker gateway. The gateway forwards requests to the existing application service, preserving its database, uploads, sessions, and application behavior. This changes the public address without migrating or resetting application records. The origin is configured as the `SOURCE_ORIGIN` Worker secret and is not committed to source. Gateway code is in `infrastructure/public-domain/worker.mjs`.
